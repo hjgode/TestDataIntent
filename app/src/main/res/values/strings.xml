@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">TestDataIntent</string>
+    <string name="actionEMDK">com.wavelink.intent.action.EMDK.SEND</string>
+    <string name="actionBARCODE">com.wavelink.intent.action.BARCODE</string>
+    <string name="intentCategory">android.intent.category.DEFAULT</string>
+    <string name="intentPackage">com.wavelink.velocity</string>
+    <string name="intentClassname">com.wavelink.velocity.te.MainActivity</string>
+
+    <string name="actionBARCODECustom">com.wavelink.intent.action.BARCODE</string>
+    <string name="intentCategoryCustom"></string>
+    <string name="intentPackageCustom"></string>
+    <string name="intentClassnameCustom"></string>
+
+    <string name="datawedge_intent_key_data">com.symbol.datawedge.data_string</string>
+
+</resources>
