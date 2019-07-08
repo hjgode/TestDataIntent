@@ -1,16 +1,48 @@
 <resources>
     <string name="app_name">TestDataIntent</string>
+
+    <!-- Action strings -->
     <string name="actionEMDK">com.wavelink.intent.action.EMDK.SEND</string>
     <string name="actionBARCODE">com.wavelink.intent.action.BARCODE</string>
-    <string name="intentCategory">android.intent.category.DEFAULT</string>
-    <string name="intentPackage">com.wavelink.velocity</string>
-    <string name="intentClassname">com.wavelink.velocity.te.MainActivity</string>
-
     <string name="actionBARCODECustom">com.wavelink.intent.action.BARCODE</string>
+
+    <!-- Category -->
+    <string name="intentCategory">android.intent.category.DEFAULT</string>
     <string name="intentCategoryCustom"></string>
+    <!-- Package -->
+    <string name="intentPackage">com.wavelink.velocity</string>
     <string name="intentPackageCustom"></string>
+    <!-- Class -->
+    <string name="intentClassname">com.wavelink.velocity.te.MainActivity</string>
     <string name="intentClassnameCustom"></string>
 
-    <string name="datawedge_intent_key_data">com.symbol.datawedge.data_string</string>
+    <!-- Symbol/Motorola/Zebra EMDK Intent API consts -->
+    <!--
+        String LABEL_TYPE_TAG = "com.symbol.datawedge.label_type"; String contains the barcode label type
 
+        String DATA_STRING_TAG = "com.symbol.datawedge.data_string"; String contains the output data as a String.
+        In the case of concatenated barcodes, the decode data is concatenated and sent out as a single string.
+
+        String DECODE_DATA_TAG = "com.symbol.datawedge.decode_data"; Decode data is returned as a list of byte
+        arrays. In most cases there will be one byte array per decode. For barcode symbologies that support
+        concatenation (i.e. Codabar, Code128, MicroPDF, etc.) the decoded data is stored in multiple byte arrays
+        (one byte array per bar code). Clients can get data in each byte array by passing an index.
+    -->
+    <string name="datawedge_intent_key_data">com.symbol.datawedge.data_string</string>
+    <string name="datawedge_intent_key_data_motorola">com.motorolasolutions.datawedge.data_string</string>
+
+    <string name="datawedge_intent_key_source">com.symbol.emdk.datawedge.source</string>
+    <string name="datawedge_intent_key_source_motorola">com.motorolasolutions.emdk.datawedge.source</string>
+
+    <string name="datawedge_intent_key_labeltype_motorola">com.motorolasolutions.emdk.datawedge.label_type</string>
+    <string name="datawedge_intent_key_labeltype">com.symbol.emdk.datawedge.label_type</string>
+
+    <!--
+    Decode data returned as a list of byte arrays. In most cases there will be one byte array per decode.
+    For bar-code symbologies that support concatenation e.g. Codabar, Code128, MicroPDF, etc., the decoded
+    data is stored in multiple byte arrays (one byte array per bar code). Clients can get data in
+    each byte array by passing an index.
+    -->
+    <string name="datawedge_intent_key_decode_data_motorola">com.motorolasolutions.emdk.datawedge.decode_data</string>
+    <string name="datawedge_intent_key_decode_data">com.symbol.emdk.datawedge.decode_data</string>
 </resources>
