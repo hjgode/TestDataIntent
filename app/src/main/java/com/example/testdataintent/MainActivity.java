@@ -1,5 +1,6 @@
 package com.example.testdataintent;
 
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -7,6 +8,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.os.Build;
+import android.os.Handler;
+import android.os.Parcel;
+import android.os.UserHandle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
@@ -19,6 +24,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.net.Inet4Address;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity  {
@@ -50,13 +56,17 @@ public class MainActivity extends AppCompatActivity  {
             @Override
             public void onClick(View v) {
                 Intent intent=new Intent();
-                if(!txtCategory.getText().toString().isEmpty())
+                if(!txtCategory.getText().toString().isEmpty() && txtCategory.getText().toString().length()>0)
                     intent.addCategory(txtCategory.getText().toString());
-                if(!txtAction.getText().toString().isEmpty())
+
+                if(!txtAction.getText().toString().isEmpty()&& txtAction.getText().toString().length()>0)
                     intent.setAction(txtAction.getText().toString());   // com.wavelink.intent.action.EMDK.SEND or com.wavelink.intent.action.BARCODE
-                if(!txtClass.getText().toString().isEmpty() && !txtPackage.getText().toString().isEmpty())
+
+                if(!txtClass.getText().toString().isEmpty() && !txtPackage.getText().toString().isEmpty() &&
+                        txtClass.getText().toString().length()>0 && txtPackage.getText().toString().length()>0)
                     intent.setClassName(txtPackage.getText().toString(), txtClass.getText().toString());
-                if(!txtPackage.getText().toString().isEmpty())
+
+                if(!txtPackage.getText().toString().isEmpty() && txtPackage.getText().toString().length()>0)
                     intent.setPackage(txtPackage.getText().toString());
 
                 // ##### symbol has extra com.symbol.datawedge.data_string, com.symbol.datawedge.label_type and com.symbol.datawedge.source
@@ -155,9 +165,9 @@ public class MainActivity extends AppCompatActivity  {
             unregisterReceiver(broadcastReceiver);
             context.registerReceiver(broadcastReceiver, new IntentFilter(getResources().getString(R.string.actionBARCODE)));
 
-            txtClass.setText(getResources().getText(R.string.intentClassname));
+            txtClass.setText("");
             txtCategory.setText(getResources().getText(R.string.intentCategory));
-            txtPackage.setText(getResources().getText(R.string.intentPackage));
+            txtPackage.setText("");
         }
 
         if (item.getItemId()==R.id.use_Custom){
@@ -195,7 +205,19 @@ public class MainActivity extends AppCompatActivity  {
         return iRet;
     }
 
-    private  void mysendBroadcast(Intent intent){
+    private  void mysendBroadcast(final Intent intent){
+        int i;
+        //hide ourself
+        startActivity(getPackageManager().getLaunchIntentForPackage("com.wavelink.velocity"));// new Intent().setClassName("com.wavelink.velocity", "te.SplashActivity"));
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // Do something after 5s = 5000ms
+                sendDelayedBroadcast(intent);
+            }
+        }, 5000);
+        /*
         if(sdkVersion<26) {
             sendBroadcast(intent);
             Log.d(TAG, "using sendBroadcast");
@@ -207,8 +229,82 @@ public class MainActivity extends AppCompatActivity  {
                 addLog("Trying normal boradcast...");
                 sendBroadcast(intent);
             }
+            addLog("sendBroadcastAsForegroundUser...");
+            sendBroadcastAsForegroundUser(context, intent);
+        }
+*/
+    }
+
+    void sendDelayedBroadcast(Intent intent){
+        class delayedClass implements Runnable{
+            Intent m_intent;
+            delayedClass(Intent in) { m_intent=in; };
+            public void run(){
+                if(sdkVersion<26) {
+                    sendBroadcast(m_intent);
+                    Log.d(TAG, "sendDelayedBroadcast using sendBroadcast");
+                }else {
+                    Log.d(TAG, "sendDelayedBroadcast using implict Broadcast");
+                    //for Android O above "gives W/BroadcastQueue: Background execution not allowed: receiving Intent"
+                    //either set targetSDKversion to 25 or use implicit broadcast
+                    if(sendImplicitBroadcast(getApplicationContext(), m_intent)==0) {
+                        addLog("sendDelayedBroadcast Trying normal boradcast...");
+                        sendBroadcast(m_intent);
+                    }
+                }
+
+            }
+        }
+    }
+
+    /**
+     * Wrapper for sendBroadcastAsUser
+     *
+     * @param context
+     *            the context
+     * @param intent
+     *            the intent
+     * @param user
+     *            the user handle
+     */
+//    public static void sendBroadcastAsUser(Context context, Intent intent, UserHandle user) {
+//        Log.d(TAG, "sendBroadcastAsUser, user: " + user.hashCode());
+//        context.sendBroadcastAsUser(intent, user);
+//        // only for system apps:     <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS" />
+//    }
+
+    /**
+     * Sends a broadcast as the foreground user
+     *
+     * @param context
+     *            the context
+     * @param intent
+     *            the intent
+     */
+    public static void sendBroadcastAsForegroundUser(Context context, Intent intent) {
+        Log.d(TAG, "sendBroadcastAsForegroundUser");
+//        UserHandle user = getForegroundUserHandle(context);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            //Only controls those registered in manifest for Android O
+            PackageManager pm = context.getPackageManager();
+            List<ResolveInfo> matches = pm.queryBroadcastReceivers(intent, 0);
+            if (matches != null && matches.size() >= 1) {
+                for (ResolveInfo resolveInfo : matches) {
+                    Intent explicit = new Intent(intent);
+                    ComponentName cn = new ComponentName(resolveInfo.activityInfo.applicationInfo.packageName,
+                            resolveInfo.activityInfo.name);
+
+                    explicit.setComponent(cn);
+                    //context.sendBroadcastAsUser(explicit, user); // would need system permission     <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS" />
+                    context.sendBroadcast(explicit);
+
+                }
+            }
         }
 
+        //Finally send to those registered at runtime and also be compatible with old versions
+        //context.sendBroadcastAsUser(intent, user); // would need system permission     <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS" />
+        context.sendBroadcast(intent);
     }
 
     void addLog(final String msg){

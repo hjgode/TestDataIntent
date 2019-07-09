@@ -1,6 +1,13 @@
 <resources>
     <string name="app_name">TestDataIntent</string>
 
+    <!--
+    am broadcast -a com.wavelink.intent.action.BARCODE -n com.wavelink.velocity/.MainActivity -c android.intent.category.DEFAULT -e com.symbol.datawedge.data_string 09876
+
+    ## Works in Velocity 2.0.8 on CK65 and VM1A replace -e with minus minus es, see below
+    am broadcast -a com.wavelink.intent.action.BARCODE -c android.intent.category.DEFAULT -e com.symbol.datawedge.data_string 09876
+    -->
+    <string name="am_broadcast">am broadcast -a com.wavelink.intent.action.BARCODE -c android.intent.category.DEFAULT --es com.symbol.datawedge.data_string 09876</string>
     <!-- Action strings -->
     <string name="actionEMDK">com.wavelink.intent.action.EMDK.SEND</string>
     <string name="actionBARCODE">com.wavelink.intent.action.BARCODE</string>
